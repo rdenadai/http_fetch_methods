@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WebSockets</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;500&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+      html,
+      body {
+        font-family: "Roboto", sans-serif;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="container">
+      <div
+        class="w-full h-fit px-2 py-2 text-2xl grid place-items-center bg-teal-500 text-white"
+      >
+        Web Sockets
+      </div>
+      <div class="px-2 py-2">
+        <div class="grid grid-cols-2 w-96">
+          <div class="px-2 py-2">
+            <button
+              hx-trigger="click"
+              onclick="createNewChart()"
+              class="bg-blue-500 px-2 py-2 text-white rounded-sm cursor-pointer w-full"
+            >
+              New Chart
+            </button>
+          </div>
+          <div class="px-2 py-2">
+            <button
+              hx-trigger="click"
+              onclick="stopAllConnections()"
+              class="bg-red-500 px-2 py-2 text-white rounded-sm cursor-pointer w-full"
+            >
+              Stop All WSS
+            </button>
+          </div>
+        </div>
+        <div id="charts" class="w-full h-fit"></div>
+      </div>
+    </div>
+  </body>
+  <script>
+    const charts = [];
+
+    const addChartData = (chart, label, newData) => {
+      chart.data.labels.push(label);
+      chart.data.datasets.forEach((dataset) => {
+        dataset.data.push(newData);
+      });
+      chart.update();
+    };
+
+    const stopAllConnections = () => {
+      charts.forEach((item) => {
+        item?.wss?.close();
+      });
+    };
+
+    const createNewChart = () => {
+      const chartName = `chart-${charts.length}`;
+
+      const newCanvas = document.createElement("canvas");
+      newCanvas.setAttribute("id", chartName);
+      const ctx = document.getElementById("charts");
+      ctx.appendChild(newCanvas);
+      const chartCanvas = document.getElementById(chartName);
+
+      const chart = new Chart(chartCanvas, {
+        type: "line",
+        data: {
+          labels: [],
+          datasets: [
+            {
+              label: "Random Walk",
+              data: [],
+              fill: false,
+              borderColor: "rgb(75, 192, 192)",
+              tension: 0.1,
+            },
+          ],
+        },
+      });
+
+      const wss = new WebSocket("ws://localhost:8081/wss");
+      wss.onmessage = function (event) {
+        const data = JSON.parse(event.data);
+        addChartData(chart, data.n, data.v);
+      };
+
+      charts.push({
+        chart: chart,
+        wss: wss,
+      });
+    };
+  </script>
+</html>

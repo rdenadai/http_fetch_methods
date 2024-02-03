@@ -1,0 +1,25 @@
+[tool.poetry]
+name = "http-fetch-methods"
+version = "0.1.0"
+description = ""
+authors = ["Rodolfo De Nadai <rdenadai@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fastapi = {extras = ["all"], version = "^0.109.0"}
+sse-starlette = "^2.0.0"
+websockets = "^12.0"
+uvicorn = "^0.27.0.post1"
+gunicorn = "^21.2.0"
+
+
+[tool.poetry.group.dev.dependencies]
+black = "^24.1.1"
+isort = "^5.13.2"
+ruff = "^0.1.15"
+mypy = "^1.8.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

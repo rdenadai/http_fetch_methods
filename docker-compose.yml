@@ -1,0 +1,28 @@
+version: "3"
+
+services:
+  app_sse:
+    build: .
+    entrypoint: ./entrypoint.sh
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+      - "5678:5678"
+    environment:
+      MODE: development
+      TYPE: sse
+    volumes:
+      - ./:/code
+
+  app_ws:
+    build: .
+    entrypoint: ./entrypoint.sh
+    restart: unless-stopped
+    ports:
+      - "8081:8080"
+      - "5679:5678"
+    environment:
+      MODE: development
+      TYPE: wss
+    volumes:
+      - ./:/code
